@@ -18,7 +18,8 @@ NIM_API_KEY=nvapi-... npm start
 | `NIM_API_KEY` | — | Fallback key when client sends no `Authorization` header |
 | `NIM_API_BASE` | `https://integrate.api.nvidia.com/v1` | NIM endpoint |
 | `THINKING` | `true` | Send thinking params to NIM (`false` disables). Legacy `ENABLE_THINKING_MODE` also read |
-| `SHOW_REASONING` | `false` | `true` merges `reasoning_content` into output as `<think>` blocks; `false` strips it (Janitor-safe) |
+| `SHOW_REASONING` | `true` | `true` merges `reasoning_content` into output as `<think>` blocks; `false` strips it |
+| `STREAM_DEFAULT` | `true` | Omitted `stream` field defaults to SSE streaming; explicit `false` still returns JSON |
 | `REASONING_EFFORT` | auto (`max` for `glm`) | Override `reasoning_effort` (`low`\|`high`\|`max`) |
 | `MODEL_MAP` | `{}` | Optional alias JSON, e.g. `{"z-ai/glm-5-3-flash":"z-ai/glm-5.3"}` |
 

@@ -21,9 +21,13 @@ app.use(express.json({ limit: '10mb' }));
 //   `thinking`) alongside `content`, in both message and delta objects.
 const NIM_API_BASE = (process.env.NIM_API_BASE || 'https://integrate.api.nvidia.com/v1').replace(/\/$/, '');
 
+// Streaming by default: an omitted `stream` field means SSE streaming.
+// Explicit `stream:false` still returns a single JSON response.
+// Set STREAM_DEFAULT=false to restore opt-in streaming.
+const STREAM_DEFAULT = String(process.env.STREAM_DEFAULT ?? 'true').toLowerCase() !== 'false';
 // SHOW_REASONING controls OUTPUT only (whether reasoning is merged into
 // content as <think> blocks). Thinking is still SENT upstream regardless.
-const SHOW_REASONING = String(process.env.SHOW_REASONING || 'false').toLowerCase() === 'true';
+const SHOW_REASONING = String(process.env.SHOW_REASONING ?? 'true').toLowerCase() !== 'false';
 // THINKING controls whether thinking/reasoning parameters are SENT to NIM.
 // Defaults to true per GLM/Kimi/Qwen docs. Set THINKING=false to disable.
 const THINKING_ENABLED = String(
@@ -146,7 +150,7 @@ app.get('/', (req, res) => {
     usage: 'Point JanitorAI/OpenAI clients at /v1. Any `model` string is forwarded verbatim to NIM.',
     thinking: THINKING_ENABLED,
     reasoning_display: SHOW_REASONING,
-    env: ['NIM_API_KEY', 'NIM_API_BASE', 'THINKING', 'SHOW_REASONING', 'REASONING_EFFORT', 'MODEL_MAP'],
+    env: ['NIM_API_KEY', 'NIM_API_BASE', 'THINKING', 'SHOW_REASONING', 'STREAM_DEFAULT', 'REASONING_EFFORT', 'MODEL_MAP'],
   });
 });
 
@@ -201,7 +205,7 @@ async function handleChat(req, res) {
     });
   }
   const nimModel = resolveModel(requestedModel);
-  const stream = body.stream ?? false;
+  const stream = body.stream ?? STREAM_DEFAULT;
 
   const {
     model: _m,
